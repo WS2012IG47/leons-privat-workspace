@@ -17,16 +17,16 @@ public class MergeSort {
 	public static void main(String[] args) {
 		// println("geben sie den Pfard zu der zu sortierenden Datei an");
 		// String filename = readLine();
-		String filename1 = "C:\\Users\\Leon\\Documents\\workspace\\leons-privat-workspace\\ADS\\uebung04\\numbers.txt";
-		String filename2 = "C:\\Users\\Leon\\Documents\\workspace\\leons-privat-workspace\\ADS\\uebung04\\hilfsbandEins.txt";
-		String filename3 = "C:\\Users\\Leon\\Documents\\workspace\\leons-privat-workspace\\ADS\\uebung04\\hilfsbandZwei.txt";
+		String filename1 = "G:\\workspace\\leons-privat-workspace\\ADS\\uebung04\\numbers.txt";
+		String filename2 = "G:\\workspace\\leons-privat-workspace\\ADS\\uebung04\\hilfsbandEins.txt";
+		String filename3 = "G:\\workspace\\leons-privat-workspace\\ADS\\uebung04\\hilfsbandZwei.txt";
 
 		if (isFilePresent(filename1)) {
 			Object quellband;
 			Object hilfsbandEins;
 			Object hilfsbandZwei;
 
-			for (int lauflänge = 1; lauflänge < 25; lauflänge++)
+			for (int lauflänge = 1; lauflänge < 1001; lauflänge = lauflänge * 2)
 			{
 			 quellband = openInputFile(filename1);
 			 hilfsbandEins = openOutputFile(filename2);
@@ -130,35 +130,35 @@ public class MergeSort {
 		}
 	}
 	
-	public static void split(int lauflänge, Object quellband,
-			Object hilfsbandEins, Object hilfsbandZwei) {
-		int zahl = readInt(quellband);
+	public static void split(int lauflänge, Object quellband, Object hilfsbandEins, Object hilfsbandZwei) {
 		boolean bandauswahl = true;
 
+		int zahl;
+		
 		while (!isEndOfInputFile(quellband)) {
 			if (bandauswahl) {
 				for (int i = 0; i < lauflänge; i++) {
+					zahl = readInt(quellband);
+					
 					print(hilfsbandEins, " " + zahl);
 					
 					if (isEndOfInputFile(quellband))
 					{
 						return;
 					}
-					
-					zahl = readInt(quellband);
 				}
 
 				bandauswahl = false;
 			} else {
 				for (int i = 0; i < lauflänge; i++) {
+					zahl = readInt(quellband);
+					
 					print(hilfsbandZwei, " " + zahl);
 					
 					if (isEndOfInputFile(quellband))
 					{
 						return;
 					}
-					
-					zahl = readInt(quellband);
 				}
 
 				bandauswahl = true;
