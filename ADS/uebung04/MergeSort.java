@@ -11,11 +11,6 @@ import static gdi.MakeItSimple.*;
 
 public class MergeSort {
 
-	public static int zahl1;
-	public static int zahl2;
-	public static boolean reloadZahl1 = false;
-	public static boolean reloadZahl2 = false;
-
 	public static void main(String[] args) {
 		// println("geben sie den Pfard zu der zu sortierenden Datei an");
 		// String filename = readLine();
@@ -27,61 +22,49 @@ public class MergeSort {
 			Object quellband;
 			Object hilfsbandEins;
 			Object hilfsbandZwei;
-			Object ausgabeBand;
 
-			for (int lauflänge = 1; lauflänge < 11; lauflänge = lauflänge * 2) {
-				quellband = openInputFile(filename1);
+			for (int lauflänge = 1; lauflänge < 1001; lauflänge = lauflänge * 2) {
+				IntReader quellbandReader = new IntReader(filename1);
 				hilfsbandEins = openOutputFile(filename2);
 				hilfsbandZwei = openOutputFile(filename3);
 
-				split(lauflänge, quellband, hilfsbandEins, hilfsbandZwei);
+				split(lauflänge, quellbandReader, hilfsbandEins, hilfsbandZwei);
 
-				closeInputFile(quellband);
+				quellbandReader.closeIntReader();
 				closeOutputFile(hilfsbandEins);
 				closeOutputFile(hilfsbandZwei);
-				
-				quellband = openOutputFile(filename1);
-				hilfsbandEins = openInputFile(filename2);
-				hilfsbandZwei = openInputFile(filename3);
 
-				merge(lauflänge, quellband, hilfsbandEins, hilfsbandZwei);
+				quellband = openOutputFile(filename1);
+				IntReader hilfsbandEinsReader = new IntReader(filename2);
+				IntReader hilfsbandZweiReader = new IntReader(filename3);
+
+				merge(lauflänge, quellband, hilfsbandEinsReader, hilfsbandZweiReader);
 
 				closeOutputFile(quellband);
-				closeInputFile(hilfsbandEins);
-				closeInputFile(hilfsbandZwei);
-				
-					ausgabeBand = openInputFile(filename1);
-					printTape(ausgabeBand, '*', lauflänge);
-					closeInputFile(ausgabeBand);
+				hilfsbandEinsReader.closeIntReader();
+				hilfsbandZweiReader.closeIntReader();
+
+				quellband = openInputFile(filename1);
+				printTape(quellband, '*', lauflänge);
+				closeInputFile(quellband);
 			}
 		}
 	}
 
-	public static void merge(int lauflänge, Object quellband, Object hilfsbandEins, Object hilfsbandZwei) {
-		zahl1 = readInt(hilfsbandEins);
-		zahl2 = readInt(hilfsbandZwei);
-
+	public static void merge(int lauflänge, Object quellband, IntReader hilfsbandEins, IntReader hilfsbandZwei) {
 		while (onePartOfMerge(lauflänge, quellband, hilfsbandEins, hilfsbandZwei));
 	}
 
-	public static boolean onePartOfMerge(int lauflänge, Object quellband, Object hilfsbandEins, Object hilfsbandZwei) {
+	public static boolean onePartOfMerge(int lauflänge, Object quellband, IntReader hilfsbandEins, IntReader hilfsbandZwei) {
 		int hilfsbandEinsZähler = 0;
 		int hilfsbandZweiZähler = 0;
 
 		while (true) {
 
 			// ---------> Band1 EOF
-			if (isEndOfInputFile(hilfsbandEins)) {
-				while (!isEndOfInputFile(hilfsbandZwei)) {
-					
-					if (reloadZahl2) {
-						zahl2 = readInt(hilfsbandZwei);
-					}
-					
-					print(quellband, " " + zahl2);
-					hilfsbandZweiZähler++;
-					
-					reloadZahl2 = true;
+			if (!hilfsbandEins.isNumberAvailable()) {
+				while (hilfsbandZwei.isNumberAvailable()) {
+					print(quellband, "  " + hilfsbandZwei.readAndNextNumber());
 				}
 				return false;
 			}
@@ -90,15 +73,8 @@ public class MergeSort {
 			// ---------> Band1 EOS
 			if (!(hilfsbandEinsZähler < lauflänge)) {
 				while (hilfsbandZweiZähler < lauflänge) {
-
-					if (reloadZahl2) {
-						zahl2 = readInt(hilfsbandZwei);
-					}
-					
-					print(quellband, " " + zahl2);
+					print(quellband, "  " + hilfsbandZwei.readAndNextNumber());
 					hilfsbandZweiZähler++;
-					
-					reloadZahl2 = true;
 				}
 				return true;
 
@@ -106,17 +82,9 @@ public class MergeSort {
 			// <--------- Band1 EOS
 
 			// ---------> Band2 EOF
-			if (isEndOfInputFile(hilfsbandZwei)) {
-				while (!isEndOfInputFile(hilfsbandEins)) {
-					
-					if (reloadZahl1) {
-						zahl1 = readInt(hilfsbandEins);
-					}
-					
-					print(quellband, " " + zahl1);
-					hilfsbandEinsZähler++;
-					
-					reloadZahl1 = true;
+			if (!hilfsbandZwei.isNumberAvailable()) {
+				while (hilfsbandEins.isNumberAvailable()) {
+					print(quellband, "  " + hilfsbandEins.readAndNextNumber());
 				}
 
 				return false;
@@ -126,51 +94,34 @@ public class MergeSort {
 			// ---------> Band2 EOS
 			if (!(hilfsbandZweiZähler < lauflänge)) {
 				while (hilfsbandEinsZähler < lauflänge) {
-
-					if (reloadZahl1) {
-						zahl1 = readInt(hilfsbandEins);
-					}
-					
-					print(quellband, " " + zahl1);
+					print(quellband, "  " + hilfsbandEins.readAndNextNumber());
 					hilfsbandEinsZähler++;
-					
-					reloadZahl1 = true;
 				}
 				return true;
 			}
 			// <--------- Band2 EOS
 
-			if (reloadZahl1) {
-				zahl1 = readInt(hilfsbandEins);
-				reloadZahl1 = false;
-			}
-
-			if (reloadZahl2) {
-				zahl2 = readInt(hilfsbandZwei);
-				reloadZahl2 = false;
-			}
-
-			if (zahl1 <= zahl2) {
-				print(quellband, " " + zahl1);
-				reloadZahl1 = true;
-			} else {
-				print(quellband, " " + zahl2);
-				reloadZahl2 = true;
+			if (hilfsbandEins.readNumber() <= hilfsbandZwei.readNumber()) {
+				print(quellband, "  " + hilfsbandEins.readAndNextNumber());
+				hilfsbandEinsZähler++;
+			} 
+			else 
+			{
+				print(quellband, "  " + hilfsbandZwei.readAndNextNumber());
+				hilfsbandZweiZähler++;
 			}
 		}
 	}
 
-	public static void split(int lauflänge, Object quellband, Object hilfsbandEins, Object hilfsbandZwei) {
+	public static void split(int lauflänge, IntReader quellband, Object hilfsbandEins, Object hilfsbandZwei) {
 		boolean bandauswahl = true;
-		int zahl;
-		
-		while (!isEndOfInputFile(quellband)) {
+
+		while (quellband.isNumberAvailable()) {
 			if (bandauswahl) {
 				for (int i = 0; i < lauflänge; i++) {
-					zahl = readInt(quellband);
-					print(hilfsbandEins, " " + zahl);
-
-					if (isEndOfInputFile(quellband)) {
+					if (quellband.isNumberAvailable()) {
+						print(hilfsbandEins, "  " + quellband.readAndNextNumber());
+					} else {
 						return;
 					}
 				}
@@ -178,10 +129,9 @@ public class MergeSort {
 				bandauswahl = false;
 			} else {
 				for (int i = 0; i < lauflänge; i++) {
-					zahl = readInt(quellband);
-					print(hilfsbandZwei, " " + zahl);
-
-					if (isEndOfInputFile(quellband)) {
+					if (quellband.isNumberAvailable()) {
+						print(hilfsbandZwei, "  " + quellband.readAndNextNumber());
+					} else {
 						return;
 					}
 				}
@@ -189,26 +139,22 @@ public class MergeSort {
 				bandauswahl = true;
 			}
 		}
-		
-		
+
 	}
-	
-	public static void printTape(Object ausgabeBand, char delimiter, int länge)
-	{
+
+	public static void printTape(Object ausgabeBand, char delimiter, int länge) {
 		int i = 0;
-		
+
 		while (!isEndOfInputFile(ausgabeBand)) {
-			if (i == länge)
-			{
+			if (i == länge) {
 				print(delimiter);
 				i = 0;
 			}
-			
+
 			print(" " + readInt(ausgabeBand) + " ");
-			
 			i++;
 		}
-		
+
 		println();
 	}
 
